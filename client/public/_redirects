@@ -1,0 +1,2 @@
+# Netlify: let React Router handle every page (prevents 404 on refresh / direct links).
+/*    /index.html    200

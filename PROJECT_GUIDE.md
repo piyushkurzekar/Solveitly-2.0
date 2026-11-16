@@ -89,7 +89,11 @@ Open http://localhost:5173.
 | `MONGODB_URI` | **yes** | — | Atlas SRV string ending in `/solveitly?...` |
 | `JWT_SECRET` | **yes** | — | ≥ 32 characters |
 | `JWT_EXPIRES_IN_DAYS` | no | `7` | Token and cookie lifetime |
-| `CLIENT_URL` | no | `http://localhost:5173` | Allowed CORS origin |
+| `CLIENT_URL` | no | `http://localhost:5173` | Allowed CORS origin(s), comma-separated (production: the Netlify URL) |
+| `COOKIE_SAMESITE` | no | `lax` | `none` in production when the website and API are on different domains (Netlify + Render); forces `Secure` and adds `Partitioned` |
+| `TRUST_PROXY` | no | `1` | Production only: proxies in front of the API, used for the real client IP (Render = `1`) |
+
+Front-end env (`client/.env.production`, git-ignored, read at **build** time): `VITE_API_URL` = backend origin, e.g. `https://solveitly-api.onrender.com` (no `/api`, no trailing slash). Leave it unset for local development — the client then calls the relative `/api` and Vite proxies it. Template: `client/.env.example`.
 
 `server/.env` is git-ignored and contains real credentials — **never print, log or commit it.** The server exits at start-up with a readable message if a variable is missing/invalid or MongoDB is unreachable.
 
@@ -103,10 +107,12 @@ Open http://localhost:5173.
 ├── README.md                 # short setup guide
 ├── PROJECT_GUIDE.md          # this file
 ├── client/
+│   ├── .env.example          # VITE_API_URL template → copy to .env.production for Netlify builds
 │   ├── index.html            # meta tags, favicon (/brand/favicon.png)
 │   ├── vite.config.ts        # "@" alias → src, /api proxy → :5000
 │   ├── components.json       # shadcn/ui config (new-york, lucide)
 │   ├── public/
+│   │   ├── _redirects        # Netlify SPA fallback (/* → /index.html 200), copied into dist
 │   │   ├── brand/            # logo-mark.webp (owl), logo-full.webp, favicon.png, apple-touch-icon.png
 │   │   └── images/           # hero, auth illustration, courses/*, blog/*, team/*
 │   └── src/
@@ -153,9 +159,41 @@ Browser ──► Vite dev server :5173 ──(proxy /api/*)──► Express AP
 
 Because of the proxy the browser sees a **single origin**, so the httpOnly auth cookie works without cross-site cookie settings.
 
-### Production
+### Production (current setup: Netlify + Render)
 
-`npm run build` then `NODE_ENV=production npm start`: Express serves the API under `/api/*` and the built React app from `client/dist` (SPA fallback `app.get("/{*splat}")` returns `index.html`). One process, one origin.
+```
+Browser ──► Netlify (static files from client/dist)          https://<site>.netlify.app
+   │
+   └── fetch https://<render-service>.onrender.com/api/*  ──►  Render web service (Express API) ──► MongoDB Atlas
+       (cross-origin, withCredentials, CORS + SameSite=None cookie)
+```
+
+**API → Render (Web Service, created manually in the dashboard)**
+
+| Setting | Value |
+|---|---|
+| Root Directory | *(empty — repo root, required for npm workspaces / the root lockfile)* |
+| Build Command | `npm ci --include=dev && npm run build -w server` |
+| Start Command | `npm start -w server` |
+| Health Check Path | `/api/health` |
+| Env vars | `NODE_ENV=production`, `NODE_VERSION=22`, `MONGODB_URI`, `JWT_SECRET` (new random value), `CLIENT_URL=https://<site>.netlify.app`, `COOKIE_SAMESITE=none` |
+
+`--include=dev` is required because `NODE_ENV=production` would otherwise skip TypeScript.
+
+**Front end → Netlify (manual upload)**
+
+1. `client/.env.production`: `VITE_API_URL=https://<render-service>.onrender.com`
+2. `npm run build -w client` → upload the **`client/dist`** folder (Netlify → Deploy manually / drag & drop). `client/public/_redirects` is copied into `dist` and provides the SPA fallback.
+3. Every front-end change needs a rebuild + re-upload. `VITE_API_URL` is baked in at build time.
+
+**Cross-site cookie notes:** the login cookie is set by `onrender.com` while the page is on `netlify.app`, so it is a third-party cookie (`SameSite=None; Secure; Partitioned`). It works in Chrome, Edge and Firefox. **Safari / iPhone may block it** (Intelligent Tracking Prevention), so logins might not persist there. If that becomes a problem, switch to a Netlify proxy rule in `_redirects` (`/api/*  https://<render-service>.onrender.com/api/:splat  200`) and build without `VITE_API_URL` (first-party cookie, `COOKIE_SAMESITE=lax`), or put both behind one custom domain (`solveitly.com` + `api.solveitly.com`).
+
+**Other notes**
+- Render free instances sleep after ~15 min idle; the first request then takes ~30–60 s. A free uptime monitor pinging `/api/health` every 10 minutes avoids this.
+- Content changes still need `npm run seed -w server` (run locally against the same Atlas database).
+- Atlas Network Access must allow `0.0.0.0/0` (Render IPs change).
+
+Alternative single-server option: `npm run build` then `NODE_ENV=production npm start` — Express then also serves `client/dist` (SPA fallback `app.get("/{*splat}")`). One process, one origin.
 
 ### Back-end layering (per feature module)
 
@@ -349,7 +387,7 @@ Brand colours come from the owl logo (`client/public/brand/logo-mark.webp`): **n
 - **TypeScript 7** (native compiler) is used — `tsc` is the binary. Avoid removed options like `baseUrl`; `paths` works without it.
 - Original downloaded "jpg" images were actually WebP; all images are now `.webp`.
 - A leftover empty `controllers/` folder may exist at the root (Windows/VS Code lock) — safe to delete.
-- The repository is **not a git repo yet**. Run `git init` before collaborating; `.gitignore` is already in place.
+- Git remote: `https://github.com/piyushkurzekar/Solveitly-2.0` (branch `main`). Render deploys the API from it; the front end is built locally and uploaded to Netlify. `server/.env` and `client/.env.production` are git-ignored — set secrets in the Render dashboard.
 - The main JS bundle is ~685 kB (Vite warns). Acceptable for now; can be reduced with more code splitting.
 
 ---
@@ -366,7 +404,7 @@ Brand colours come from the owl logo (`client/public/brand/logo-mark.webp`): **n
 - "Certificates on completion" is advertised on the site (hero highlights, auth pages, features) but **no certificate feature exists** — build it or remove the claim.
 - Footer contact details (address, phone) are placeholders in `client/src/data/site.ts`.
 - Blog cards are static with "Coming soon" — no blog module.
-- No automated tests, no CI, no git history.
+- No automated tests and no CI pipeline.
 - No password reset / email verification, no profile editing.
 - No quizzes/assignments, no video lessons, no payments.
 - Dark-mode tokens are not defined (light theme only).

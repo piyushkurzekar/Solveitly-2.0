@@ -15,9 +15,10 @@ export function createApp() {
   const app = express();
 
   app.disable("x-powered-by");
-  if (isProd) app.set("trust proxy", 1);
+  if (isProd) app.set("trust proxy", env.TRUST_PROXY);
 
-  app.use(helmet());
+  // The website may live on another domain (e.g. Netlify), so allow it to read API responses.
+  app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
   app.use(express.json({ limit: "100kb" }));
   app.use(cookieParser());

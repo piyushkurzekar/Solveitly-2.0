@@ -1,8 +1,13 @@
 import axios, { isAxiosError } from "axios";
 
-/** All requests go to /api; Vite proxies it to the Express server in dev. */
+/**
+ * Backend origin, e.g. "https://solveitly-api.onrender.com" (set VITE_API_URL in client/.env.production).
+ * Empty in local development: requests go to /api and Vite proxies them to the Express server.
+ */
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? "").trim().replace(/\/+$/, "");
+
 export const api = axios.create({
-  baseURL: "/api",
+  baseURL: `${API_ORIGIN}/api`,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });

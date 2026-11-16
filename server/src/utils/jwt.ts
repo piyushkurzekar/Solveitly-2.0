@@ -24,10 +24,15 @@ export function verifyToken(token: string): TokenPayload {
   return { sub: decoded.sub, role: decoded.role as UserRole };
 }
 
+const crossSite = env.COOKIE_SAMESITE === "none";
+
 export const authCookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: isProd,
-  sameSite: "lax",
+  // Browsers only accept SameSite=None cookies over HTTPS.
+  secure: isProd || crossSite,
+  sameSite: env.COOKIE_SAMESITE,
+  // Cross-site: opt into CHIPS so Chrome keeps the cookie even when third-party cookies are restricted.
+  ...(crossSite ? { partitioned: true } : {}),
   path: "/",
   maxAge: maxAgeSeconds * 1000,
 };
