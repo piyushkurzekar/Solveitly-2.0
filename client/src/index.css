@@ -1,0 +1,123 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/plus-jakarta-sans";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Brand colours come from the Solveitly owl logo:
+ *   navy #19255e (owl body, wordmark) · gold #e3bd4b (outline, bulb)
+ */
+:root {
+  --radius: 0.75rem;
+
+  --navy-950: #0b1233;
+  --navy-900: #111a47;
+  --navy-800: #19255e;
+  --navy-700: #22317a;
+  --navy-600: #2d3f96;
+  --navy-100: #e6e9f5;
+  --navy-50: #f3f5fb;
+  --gold-600: #c99b1f;
+  --gold-500: #e3bd4b;
+  --gold-400: #ecce72;
+  --gold-100: #fbf2d5;
+
+  --background: #ffffff;
+  --foreground: #121a3d;
+  --card: #ffffff;
+  --card-foreground: #121a3d;
+  --popover: #ffffff;
+  --popover-foreground: #121a3d;
+  --primary: var(--navy-800);
+  --primary-foreground: #ffffff;
+  --secondary: var(--navy-50);
+  --secondary-foreground: var(--navy-800);
+  --muted: #f6f7fb;
+  --muted-foreground: #5b6382;
+  --accent: var(--gold-100);
+  --accent-foreground: var(--navy-800);
+  --destructive: #dc2626;
+  --border: #e4e7f0;
+  --input: #d9dded;
+  --ring: var(--navy-600);
+}
+
+@theme inline {
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+  --color-navy-100: var(--navy-100);
+  --color-navy-50: var(--navy-50);
+  --color-gold-600: var(--gold-600);
+  --color-gold-500: var(--gold-500);
+  --color-gold-400: var(--gold-400);
+  --color-gold-100: var(--gold-100);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply tracking-tight text-balance;
+  }
+}
+
+@utility container-page {
+  @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
+}
+
+/* Printing / "Save as PDF": keep code-block colours and use the full page. */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  @page {
+    margin: 16mm 14mm;
+  }
+}
+
+/* Subtle dotted grid used on dark hero / CTA backgrounds. */
+@utility bg-dots {
+  background-image: radial-gradient(rgb(255 255 255 / 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+}

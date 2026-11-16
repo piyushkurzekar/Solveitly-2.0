@@ -1,0 +1,25 @@
+{
+  "name": "solveitly",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Solveitly e-learning platform — React client + Express API",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,magenta \"npm:dev -w server\" \"npm:dev -w client\"",
+    "dev:server": "npm run dev -w server",
+    "dev:client": "npm run dev -w client",
+    "build": "npm run build -w server && npm run build -w client",
+    "start": "npm run start -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
+    "dev:lan": "concurrently -n api,web -c blue,magenta \"npm:dev -w server\" \"npm run dev -w client -- --host\""
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7"
+  }
+}
