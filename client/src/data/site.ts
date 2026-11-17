@@ -1,7 +1,7 @@
 export const site = {
   name: "Solveitly",
   tagline: "Learn. Solve. Grow.",
-  organization: "MVAPS Solution Organization",
+  organization: "MVAPS & Company",
   // TODO: replace placeholder contact details with real ones.
   contact: {
     email: "support@solveitly.com",
@@ -85,27 +85,37 @@ export const technologies = [
   "Jenkins",
 ] as const;
 
-// `photo` is optional — without it the card shows the person's initials.
-export const team: { name: string; role: string; bio: string; photo?: string }[] = [
-  {
-    name: "Azad Bhasme",
-    role: "Chief Executive Officer (CEO)",
-    bio: "Visionary leader driving Solveitly’s mission to revolutionize online education.",
-    photo: "/images/team/azad-bhasme.webp",
-  },
-  {
-    name: "Piyush Kurzekar",
-    role: "Chief Operating Officer (COO) & Chief Financial Officer (CFO)",
-    bio: "Managing operations, financial strategy, and organisational processes to ensure sustainable growth and long-term efficiency.",
-    photo: "/images/team/piyush-kurzekar.webp",
-  },
-  {
-    name: "Abhishek Giri",
-    role: "Chief Technology & Marketing Officer (CTO & CMO)",
-    bio: "Technology innovator and marketing strategist leading platform development and brand outreach.",
-    photo: "/images/team/abhishek-giri.webp",
-  },
-];
+/** Solveitly is the EdTech vertical of MVAPS & Company (content from the company website). */
+export const parentCompany = {
+  name: "MVAPS & Company",
+  url: "https://mvaps-and-company.onrender.com",
+  tagline: "Making Visions Achievable with Powerful Solutions",
+  founded: "20 May 2024",
+  location: "Nagpur, Maharashtra, India",
+  description:
+    "MVAPS & Company is the parent organisation uniting technology, digital products, educational initiatives and media platforms — guided by useful technology and responsible growth.",
+  /** Products shown in the parent-company card (Solveitly is highlighted as the current site). */
+  products: [
+    {
+      name: "SnapDocs AI",
+      area: "AI document processing",
+      description: "Photos to PDF, image conversion, OCR text extraction and PDF tools.",
+      url: "https://snapdocsaio.onrender.com/",
+    },
+    {
+      name: "Solveitly",
+      area: "EdTech",
+      description: "Self-paced courses in programming, web, cloud and DevOps.",
+      current: true,
+    },
+    {
+      name: "Project Nest AI",
+      area: "Client project delivery",
+      description: "AI, web, mobile and custom software builds for students, startups and enterprises.",
+      url: "https://project-nest-ai.onrender.com/",
+    },
+  ] as { name: string; area: string; description: string; url?: string; current?: boolean }[],
+};
 
 export const blogPosts = [
   {

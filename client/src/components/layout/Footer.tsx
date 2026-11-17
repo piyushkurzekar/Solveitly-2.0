@@ -1,10 +1,12 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { Link } from "react-router";
-import { site } from "@/data/site";
+import { parentCompany, site } from "@/data/site";
 import { Logo } from "./Logo";
 import { SocialLinks } from "./SocialLinks";
 
-const columns = [
+type FooterLink = { label: string; to: string; external?: boolean };
+
+const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: "Explore",
     links: [
@@ -18,7 +20,7 @@ const columns = [
     title: "Company",
     links: [
       { label: "About us", to: "/#about" },
-      { label: "Our team", to: "/#about" },
+      { label: parentCompany.name, to: parentCompany.url, external: true },
       { label: "Log in", to: "/login" },
       { label: "Create account", to: "/register" },
     ],
@@ -44,9 +46,20 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               {col.links.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.to} className="transition-colors hover:text-gold-400">
-                    {link.label}
-                  </Link>
+                  {link.external ? (
+                    <a
+                      href={link.to}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 transition-colors hover:text-gold-400"
+                    >
+                      {link.label} <ArrowUpRight className="size-3.5" />
+                    </a>
+                  ) : (
+                    <Link to={link.to} className="transition-colors hover:text-gold-400">
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -87,7 +100,17 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {site.name}. All rights reserved.
           </p>
-          <p>A product of {site.organization}</p>
+          <p>
+            A product of{" "}
+            <a
+              href={parentCompany.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-white/70 underline-offset-4 hover:text-gold-400 hover:underline"
+            >
+              {parentCompany.name}
+            </a>
+          </p>
         </div>
       </div>
     </footer>

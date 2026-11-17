@@ -41,7 +41,7 @@ client/src/
   components/layout/   Navbar, Footer, RootLayout
   features/auth/       auth API calls, hooks, form schemas, route guards
   features/home/       landing page sections
-  data/                static content (courses, team, blog) — to be moved to the API
+  data/                static marketing content (features, parent company, blog)
   lib/                 axios instance, helpers
   pages/               route-level pages
   router.tsx           all routes

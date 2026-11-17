@@ -3,21 +3,23 @@
 > **Read this first.** This document explains what Solveitly is, how the code is organised, how data flows through the system, the conventions to follow and what is still missing. It is written so that a developer or an AI coding agent can start working on the project without any other context.
 >
 > Last updated: 16 Nov 2026.
+>
+> **Live:** website https://solveitly.netlify.app · API https://solveitly-2-0.onrender.com (health: `/api/health`)
 
 ---
 
 ## 1. What is Solveitly?
 
-Solveitly is an **e-learning website** built by **MVAPS Solution Organization**. Visitors browse courses (C, C++, Python, Java, SQL, HTML, CSS, JavaScript, Web Development Bootcamp, Cloud Computing, DevOps), create a free account, read lessons with code examples, mark lessons complete, track progress on a dashboard and download course notes as PDF.
+Solveitly is an **e-learning website** built by **MVAPS & Company** (https://mvaps-and-company.onrender.com) — it is the company's EdTech vertical, alongside MVAPS Solutions (IT) and Infos Digital (media). Visitors browse courses (C, C++, Python, Java, SQL, HTML, CSS, JavaScript, Web Development Bootcamp, Cloud Computing, DevOps), create a free account, read lessons with code examples, mark lessons complete, track progress on a dashboard and download course notes as PDF.
 
 **Tagline:** "Learn. Solve. Grow."
-**Co-founders shown on the site:** Azad Bhasme (CEO), Piyush Kurzekar (COO & CFO), Abhishek Giri (CTO & CMO).
+The landing page does **not** show a team section; instead the About section ends with a "parent company" card (`features/home/ParentCompanyCard.tsx`, data `parentCompany` in `data/site.ts`) that links to the MVAPS & Company website. The footer links there too.
 
 ### Current status
 
 | Area | Status |
 |---|---|
-| Landing page (hero, features, courses, how it works, about/team, blog, CTA, footer) | ✅ Done |
+| Landing page (hero, features, courses, how it works, about + parent company, blog, CTA, footer) | ✅ Done |
 | Auth: register, login, logout, current user (JWT in httpOnly cookie) | ✅ Done |
 | Course catalogue with filters | ✅ Done (data from MongoDB) |
 | Course detail page (overview, outcomes, syllabus) | ✅ Done |
@@ -114,13 +116,13 @@ Front-end env (`client/.env.production`, git-ignored, read at **build** time): `
 │   ├── public/
 │   │   ├── _redirects        # Netlify SPA fallback (/* → /index.html 200), copied into dist
 │   │   ├── brand/            # logo-mark.webp (owl), logo-full.webp, favicon.png, apple-touch-icon.png
-│   │   └── images/           # hero, auth illustration, courses/*, blog/*, team/*
+│   │   └── images/           # hero, auth illustration, courses/*, blog/*
 │   └── src/
 │       ├── main.tsx          # QueryClient, RouterProvider, Toaster
 │       ├── router.tsx        # all routes + guards + lazy pages
 │       ├── index.css         # Tailwind v4 theme tokens (navy/gold), utilities, print rules
 │       ├── lib/              # api.ts (axios + error helpers), utils.ts (cn)
-│       ├── data/site.ts      # static marketing content: nav, features, steps, team, blog, contact
+│       ├── data/site.ts      # static marketing content: nav, features, steps, parentCompany, blog, contact
 │       ├── components/
 │       │   ├── ui/           # button, card, input, label, spinner (shadcn style)
 │       │   └── layout/       # Navbar, Footer, Logo, SocialLinks, RootLayout
@@ -357,7 +359,7 @@ Brand colours come from the owl logo (`client/public/brand/logo-mark.webp`): **n
 - Button variants (`components/ui/button.tsx`): `default` (navy), `gold`, `outline`, `outlineLight` (on dark backgrounds), `secondary`, `ghost`, `link`, `destructive`; sizes `sm`, `default`, `lg`, `xl`, `icon`. Use `asChild` with `<Link>` for link-buttons.
 - Section pattern on the landing page: `SectionHeader` (gold uppercase eyebrow + navy title + muted description), alternating white and `bg-muted` sections, dark navy hero and CTA.
 - `Logo` component: `tone="light"` (on white) or `tone="dark"` (owl inside a white badge — the navy owl is invisible on navy otherwise).
-- Static marketing text (nav links, features, steps, team, blog cards, contact details, social links) lives in `client/src/data/site.ts` — edit content there, not in the components.
+- Static marketing text (nav links, features, steps, parent company, blog cards, contact details, social links) lives in `client/src/data/site.ts` — edit content there, not in the components.
 
 ---
 
@@ -375,7 +377,7 @@ Brand colours come from the owl logo (`client/public/brand/logo-mark.webp`): **n
 10. Mongoose 9: use `returnDocument: "after"` (not `new: true`) in `findOneAndUpdate`.
 11. Express 5 wildcard routes use the `"/{*splat}"` syntax.
 12. Tailwind v4: theme changes go in `index.css` (`@theme inline`), plugins via `@plugin` — there is no `tailwind.config.js`.
-13. **Content honesty:** don't add fabricated statistics ("10,000+ students"), fake testimonials or stock photos presented as real team members. The old site used AI-generated portraits for the founders; they were replaced with real photos supplied by the owner.
+13. **Content honesty:** don't add fabricated statistics ("10,000+ students"), fake testimonials or stock photos presented as real team members. The old site used AI-generated portraits for the founders; the team section was later removed at the owner's request.
 14. After changes run `npm run typecheck` (and `npm run build` for bigger changes).
 
 ---
@@ -416,5 +418,5 @@ Brand colours come from the owl logo (`client/public/brand/logo-mark.webp`): **n
 1. **Analysis** of the original project: Express + EJS + MongoDB with only register/login and a static landing page; several bugs (broken links, raw JSON errors, hard-coded `"secret"` JWT fallback, no unique email, duplicated navbar, hot-linked images).
 2. **Rewrite** into the current monorepo: React + Vite + Tailwind client, Express + TypeScript API, proper auth (validation, rate limiting, httpOnly cookie, `/me`, logout), images downloaded locally. (The old code was kept in `legacy/` during the rewrite and later deleted.)
 3. **MongoDB Atlas** connected (cluster `Cluster0`, database `solveitly`); auth flow tested end-to-end.
-4. **Rebrand**: new owl logo, navy/gold theme, professional landing page redesign, real founder photos (Sanket Chaudhari removed from the team at the owner's request; Piyush's role updated to COO & CFO).
+4. **Rebrand**: new owl logo, navy/gold theme, professional landing page redesign, real founder photos (later the whole team section was replaced by the MVAPS & Company parent-company card).
 5. **Learning platform**: Course/Lesson/Enrollment models, seed pipeline, 61 written lessons, course catalogue, detail, lesson viewer, progress, dashboard and PDF notes — verified with an automated browser test (register → lesson → complete → next → dashboard → PDF → mobile → 404).

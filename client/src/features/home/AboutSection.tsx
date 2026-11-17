@@ -1,15 +1,7 @@
 import { CheckCircle2, Quote } from "lucide-react";
-import { missionPoints, site, team } from "@/data/site";
+import { missionPoints, site } from "@/data/site";
+import { ParentCompanyCard } from "./ParentCompanyCard";
 import { SectionHeader } from "./SectionHeader";
-
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
 export function AboutSection() {
   return (
@@ -63,44 +55,9 @@ export function AboutSection() {
           </div>
         </div>
 
-        {/* founders */}
+        {/* parent company */}
         <div className="mt-28">
-          <SectionHeader
-            eyebrow="Our team"
-            title="Meet the co-founders"
-            description={`The people building ${site.name} and shaping the future of online education.`}
-          />
-          <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {team.map((member) => (
-              <div
-                key={member.name}
-                className="rounded-2xl border bg-card p-8 text-center transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-navy-900/10"
-              >
-                {member.photo ? (
-                  <img
-                    src={member.photo}
-                    alt={`Portrait of ${member.name}`}
-                    width={144}
-                    height={144}
-                    loading="lazy"
-                    className="mx-auto size-36 rounded-full object-cover ring-4 ring-gold-100"
-                  />
-                ) : (
-                  <div
-                    aria-hidden
-                    className="mx-auto flex size-36 items-center justify-center rounded-full bg-navy-800 text-4xl font-bold tracking-wide text-gold-500 ring-4 ring-gold-100"
-                  >
-                    {initials(member.name)}
-                  </div>
-                )}
-                <div className="mt-5">
-                  <h3 className="text-lg font-bold text-navy-900">{member.name}</h3>
-                  <p className="mt-1 text-sm font-semibold text-gold-600">{member.role}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{member.bio}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ParentCompanyCard />
         </div>
       </div>
     </section>
